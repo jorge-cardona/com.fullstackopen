@@ -17,25 +17,4 @@ const Country = ( {country} ) => {
   )
 }
 
-const Countries = ({ countries }) => {
-  if (countries.length === 1) {
-    return (
-      <Country country={countries[0]} />
-    )
-  }
-
-  return (
-    <div>
-      {countries.map((country, index) =>
-        <p key={index}>
-          {country.name.common}
-          <button onClick={() => console.log('foobar')}>
-            Show
-          </button>
-        </p>
-      )}
-    </div>
-  )
-}
-
-export default Countries
+export default Country
