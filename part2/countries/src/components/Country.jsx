@@ -1,5 +1,7 @@
-const Country = ( {country} ) => {
+const Country = ( {country, weather} ) => {
+  console.log(weather)
   const {name, capital, area, languages, flags, alt} = country
+  const {temp, icon, description, speed} = weather
   
   return(
     <div>
@@ -13,6 +15,10 @@ const Country = ( {country} ) => {
         )}
       </ul>
       <img src={flags.png} alt={alt}/>
+      <h2>Weather in {capital}</h2>
+      <p>Temperature {temp} Celsius</p>
+      <img src={`https://openweathermap.org/img/wn/${icon}@4x.png`}  alt={description}/>
+      <p>Wind {speed} m/s</p>
     </div>
   )
 }
