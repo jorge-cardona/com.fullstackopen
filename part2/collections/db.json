@@ -34,6 +34,21 @@
       "id": "872f",
       "content": "a new note",
       "important": false
+    },
+    {
+      "id": "41b9",
+      "content": "this is a new note",
+      "important": true
+    },
+    {
+      "id": "0814",
+      "content": "foo bar",
+      "important": true
+    },
+    {
+      "id": "00b9",
+      "content": "display a new note",
+      "important": false
     }
   ]
 }
