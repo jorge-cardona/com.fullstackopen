@@ -14,7 +14,6 @@
     "deploy:full": "npm run build:ui && git add . && git commit -m \"notes, uibuild\" && git push"
   },
   "dependencies": {
-    "cors": "^2.8.5",
     "express": "^5.1.0",
     "static": "^2.0.0"
   }
