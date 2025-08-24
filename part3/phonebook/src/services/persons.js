@@ -15,7 +15,7 @@ const remove = id => {
 }
 
 const update = (id , newObject) => {
-  return axios.patch(`${baseUrl}/${id}`, newObject).then(response => response.data)
+  return axios.put(`${baseUrl}/${id}`, newObject).then(response => response.data)
 }
 
 export default { getAll, create, remove, update }

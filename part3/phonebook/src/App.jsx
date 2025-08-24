@@ -31,6 +31,10 @@ const App = () => {
           ))
         }).catch(error => {
             setMessage({text: `${newName} has been already removed`, type:'error'})
+            setTimeout(() => {
+              setMessage(null)
+            }, 5000)
+            setPersons(persons.filter(p => p.id !== person.id))
           })
       }
       return
@@ -49,12 +53,10 @@ const App = () => {
     setMessage({text: `${newName} added`, type: 'success'})
     setTimeout(() => {
       setMessage(null)
-    }, 5000);
+    }, 5000)
   }
 
-  const removePerson = (id, name) => {
-    console.log(id);
-    
+  const removePerson = (id, name) => {    
     if (confirm(`Delete ${name}?`)) {
       personService.remove(id).then(() => {
         setPersons(persons.filter(p => p.id !== id))

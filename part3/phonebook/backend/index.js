@@ -40,10 +40,14 @@ const generateId = () => {
 };
 
 app.get('/info', (request, response) => {
-  const entries = persons.length;
-  const now = new Date();
-  response.send(`<p>Phonebook has info for ${entries} people</p>
-                 <p>${now}</p>`);
+  Person.countDocuments().then(result => { 
+    const now = new Date();
+    response.send(`<p>Phonebook has info for ${result} people</p>
+                  <p>${now}</p>`);
+   });
+  // const now = new Date();
+  // response.send(`<p>Phonebook has info for ${entries} people</p>
+  //                <p>${now}</p>`);
 });
 
 app.get('/api/persons', (request, response) => {
@@ -88,7 +92,6 @@ app.post('/api/persons', (request, response) => {
 });
 
 app.delete('/api/persons/:id', (request, response, next) => {
-
   Person.findByIdAndDelete(request.params.id)
     .then(result => {
       response.status(204).end();
@@ -96,9 +99,26 @@ app.delete('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error));
 });
 
-const errorHandler = (error, request, response, next) => {
-  console.log(error.message);
+app.put('/api/persons/:id', (request, response, next) => {
+  const { name, number } = request.body;
 
+  Person.findById(request.params.id)
+    .then(person => {
+      if (!person) {
+        return response.status(404).end();
+      } 
+
+      person.name = name;
+      person.number = number;
+
+      return person.save().then((updatedPerson) => {
+        response.json(updatedPerson);
+      });
+    })
+    .catch(error => {next(error)});
+});
+
+const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformed id'});
   }
