@@ -44,16 +44,19 @@ const App = () => {
       number: newNumber
     }
 
-    personService.create(personObject).then(returnedPerson => {
-      setPersons(persons.concat(returnedPerson))
-      setNewName('')
-      setNewNumber('')
-    })
-
-    setMessage({text: `${newName} added`, type: 'success'})
-    setTimeout(() => {
-      setMessage(null)
-    }, 5000)
+    personService.create(personObject)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
+      .catch(error => {
+        console.log("there was an error", error.response.data.error)
+        setMessage({text: error.response.data.error, type: 'error'})
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
+      })
   }
 
   const removePerson = (id, name) => {    

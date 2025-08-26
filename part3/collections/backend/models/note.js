@@ -6,33 +6,23 @@ const url = process.env.MONGODB_URI
 
 console.log('connecting to', url)
 mongoose.connect(url)
-  .then(() => {
+  .then(result => {
     console.log('connected to MongoDB')
   })
   .catch(error => {
     console.log('error connecting to MongoDB:', error.message)
   })
 
-const personSchema = new mongoose.Schema({
-  name: {
+const noteSchema = new mongoose.Schema({
+  content: {
     type: String,
-    minLength: 3,
+    minLength: 5,
     required: true
   },
-  number: {
-    type: String,
-    minLength: 8,
-    required: true,
-    validate: {
-      validator: function(input) {
-        return /^\d{2,3}-\d{6,}$/.test(input)
-      },
-      message: props => `${props.value} is not a valid phone number`
-    }
-  },
+  important: Boolean,
 })
 
-personSchema.set('toJSON', {
+noteSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
     delete returnedObject._id
@@ -40,4 +30,4 @@ personSchema.set('toJSON', {
   }
 })
 
-module.exports = mongoose.model('Phone', personSchema)
+module.exports = mongoose.model('Note', noteSchema)
