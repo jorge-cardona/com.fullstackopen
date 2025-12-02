@@ -30,11 +30,18 @@ const App = () => {
           setPersons(persons.map(p => p.id === changedPerson.id ? returnedPerson : p
           ))
         }).catch(error => {
-            setMessage({text: `${newName} has been already removed`, type:'error'})
-            setTimeout(() => {
-              setMessage(null)
-            }, 5000)
-            setPersons(persons.filter(p => p.id !== person.id))
+            if (error.status === 404) {
+              setMessage({text: `${newName} has been already removed`, type:'error'})
+              setTimeout(() => {
+                setMessage(null)
+              }, 5000)
+              setPersons(persons.filter(p => p.id !== person.id))
+            } else if (error.status === 400) {
+              setMessage({text: error.response.data.error, type: 'error'})
+              setTimeout(() => {
+                setMessage(null)
+              }, 5000)
+            }
           })
       }
       return
