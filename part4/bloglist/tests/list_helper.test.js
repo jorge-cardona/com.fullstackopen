@@ -133,7 +133,7 @@ describe('most likes', () => {
     assert.deepEqual(result, { author: 'Michael Chan', likes: 7 })
   })
 
-  test('of biggerl ist is calculated right', () => {
+  test('of bigger list is calculated right', () => {
     const result = listHelper.mostLikes(blogs)
 
     assert.deepStrictEqual(result, { author: 'Edsger W. Dijkstra', likes: 17})
