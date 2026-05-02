@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Togglable from './components/Toggable'
+import BlogForm from './components/BlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [message, setMessage] = useState(null)
+  const blogFormRef = useRef()
   
 
   useEffect(() => {
@@ -54,25 +54,34 @@ const App = () => {
     setUser(null)
   }
 
-  const addBlog = (event) => {
+  const addBlog = (blogObject) => {
     event.preventDefault()
-    const blogObject = {
-      title,
-      author,
-      url
-    }
+    blogFormRef.current.toggleVisibility()
 
     blogService.create(blogObject).then(returnedObject => {
       setBlogs(blogs.concat(returnedObject))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
     })
 
-    setMessage({text: `a new blog ${title} by ${author} added`, type: 'success'})
+    setMessage({text: `a new blog ${blogObject.title} by ${blogObject.author} added`, type: 'success'})
     setTimeout(() => {
       setMessage(null)
     }, 5000);
+  }
+
+  const likeBlog = (id) => {
+    const blog = blogs.find(b => b.id === id)
+    const newLike = { likes: (blog.likes + 1) }
+
+    blogService.update(id, newLike).then(returnedBlog => {
+      setBlogs(blogs.map(b => b.id === id ? returnedBlog : b))
+    }).catch(error => {
+      console.log('an error should be shown')
+      setMessage({text: 'Blog could not be found', type: 'error'})
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+      setBlogs(blogs.filter(b => b.id !== id))
+    })
   }
 
   const loginForm = () => (
@@ -100,36 +109,9 @@ const App = () => {
   )
 
   const blogForm = () => (
-    <form onSubmit={addBlog}>
-      <div>
-        <h2>create new blog</h2>
-        <div>
-          <label>
-            title:
-            <input type="text"
-                  value={title}
-                  onChange={({ target }) => setTitle(target.value)}/>
-          </label>
-        </div>
-        <div>
-          <label>
-            author:
-            <input type="text"
-                  value={author}
-                  onChange={({ target }) => setAuthor(target.value)}/>
-          </label>
-        </div>
-        <div>
-          <label>
-            url:
-            <input type="text"
-                  value={url}
-                  onChange={({ target }) => setUrl(target.value)}/>
-          </label>
-        </div>
-      </div>
-      <button type="submit">create</button>
-    </form>
+    <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+      <BlogForm createBlog={addBlog}/>
+    </Togglable>
   )
 
   if (!user) return loginForm()
@@ -144,7 +126,7 @@ const App = () => {
       </p>
         {blogForm()}
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} sendLike={likeBlog} />
         )}
     </div>
   )

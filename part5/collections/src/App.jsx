@@ -1,7 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import LoginForm from './components/LoginFrom'
 import Note from './components/Note'
+import NoteForm from './components/NoteForm'
 import Notification from './components/Notification'
 import Footer from './components/Footer'
+import Togglable from './components/Togglable'
 import noteService from './services/notes'
 import loginService from './services/login'
 
@@ -13,6 +16,7 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const noteFormRef = useRef()
 
   useEffect(() => {
     noteService.getAll().then(initalNotes => {
@@ -64,26 +68,17 @@ const App = () => {
       )
       setTimeout(() => {
         setErrorMessage(null)
-      }, 5000);
+      }, 5000)
       setNotes(notes.filter(n => n.id !== id))
     })
   }
 
-  const addNote = (event) => {
-    event.preventDefault()
-    const noteObject = {
-      content: newNote,
-      important: Math.random() < 0.5
-    }
-    
+  const addNote = (noteObject) => {    
+    noteFormRef.current.toggleVisibility()
     noteService.create(noteObject).then(returnedNote => {
       setNotes(notes.concat(returnedNote))
       setNewNote('')
     })
-  }
-
-  const handleNoteChange = (event) => {
-    setNewNote(event.target.value)
   }
 
   const notesToShow = showAll
@@ -91,34 +86,20 @@ const App = () => {
                       : notes.filter(note => note.important)
 
   const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <h2>Login</h2>
-      <div>
-        <label>
-          username
-          <input type="text"
-                 value={username}
-                 onChange={({ target }) => setUsername(target.value)}/>
-        </label>
-      </div>
-      <div>
-        <label>
-          password
-          <input type="password"
-                 value={password}
-                 onChange={({ target }) => setPassword(target.value)}/>
-        </label>
-      </div>
-      <button type="submit">login</button>
-    </form>
+    <Togglable buttonLabel="login">
+      <LoginForm
+        username={username}
+        password={password}
+        handleUsernameChange={({ target }) => setUsername(target.value)}
+        handlePasswordChange={({ target }) => setPassword(target.value)}
+        handleSubmit={handleLogin} />
+    </Togglable>
   )
 
   const noteForm = () => (
-    <form onSubmit={addNote}>
-      <input value={newNote}
-              onChange={handleNoteChange}/>
-      <button type="submit">save</button>
-    </form>
+    <Togglable buttonLabel="new note" ref={noteFormRef}>
+      <NoteForm createNote={addNote} />
+    </Togglable>
   )
 
   return (
