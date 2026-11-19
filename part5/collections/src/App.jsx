@@ -10,7 +10,6 @@ import loginService from './services/login'
 
 const App = () => {
   const [notes, setNotes] = useState([])
-  const [newNote, setNewNote] = useState('a new note...')
   const [showAll, setShowAll] = useState(true)
   const [errorMessage, setErrorMessage] = useState('some error happened...')
   const [username, setUsername] = useState('')
@@ -62,7 +61,7 @@ const App = () => {
 
     noteService.update(id, changedNote).then(returnedNote => {
       setNotes(notes.map(n => n.id === id ? returnedNote : n))
-    }).catch(error => {
+    }).catch(_ => {
       setErrorMessage(
         `Note '${note.content}' was already remove from the server`
       )
@@ -73,17 +72,16 @@ const App = () => {
     })
   }
 
-  const addNote = (noteObject) => {    
+  const addNote = (noteObject) => {
     noteFormRef.current.toggleVisibility()
     noteService.create(noteObject).then(returnedNote => {
       setNotes(notes.concat(returnedNote))
-      setNewNote('')
     })
   }
 
   const notesToShow = showAll
-                      ? notes
-                      : notes.filter(note => note.important)
+    ? notes
+    : notes.filter(note => note.important)
 
   const loginForm = () => (
     <Togglable buttonLabel="login">
@@ -117,14 +115,14 @@ const App = () => {
       )}
       <div>
         <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? 'important': 'all'}
+          show {showAll ? 'important' : 'all'}
         </button>
       </div>
       <ul>
         {notesToShow.map(note =>
-          <Note key={note.id} 
-                note={note}
-                toggleImportance={() => toggleImportanceOf(note.id)} />
+          <Note key={note.id}
+            note={note}
+            toggleImportance={() => toggleImportanceOf(note.id)} />
         )}
       </ul>
       <Footer />

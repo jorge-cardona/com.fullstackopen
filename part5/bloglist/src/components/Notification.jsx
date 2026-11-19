@@ -1,5 +1,5 @@
 const Notification = ({ message }) => {
-  if (message?.text == null ) {
+  if (message?.text === undefined) {
     return null
   }
 

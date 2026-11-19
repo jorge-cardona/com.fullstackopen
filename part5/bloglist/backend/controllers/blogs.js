@@ -10,7 +10,7 @@ blogsRouter.get('/', (request, response) => {
   })
 })
 
-blogsRouter.post('/', middleware.userExtractor, async (request, response, next) => {  
+blogsRouter.post('/', middleware.userExtractor, async (request, response, next) => {
   try {
     const user = request.user
     const blog = new Blog(request.body)
@@ -23,7 +23,7 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response, next) 
 
     return response.status(201).json(savedBlog)
 
-  } catch(error) {
+  } catch (error) {
     next(error)
   }
 })
@@ -32,11 +32,11 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) =
   const user = request.user
   const blog = await Blog.findById(request.params.id)
 
-  if (!blog || user.id.toString() !== blog.user.toString() ) {
+  if (!blog || user.id.toString() !== blog.user.toString()) {
     return response.status(400).json({ error: `the '${user.username}' user did not create the blog` })
-  } 
+  }
 
-  await blog.deleteOne() 
+  await blog.deleteOne()
 
   response.status(204).end()
 })
@@ -44,23 +44,26 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) =
 blogsRouter.put('/:id', async (request, response, next) => {
   const { author, title, url, likes, user } = request.body
 
-  Blog.findById(request.params.id)
-    .then(blog => {
-      if(!blog) {
-        return response.status(404).end()
-      }
+  try {
+    const blog = await Blog.findById(request.params.id)
 
-      blog.author = author ? author : blog.author 
-      blog.title = title ? title : blog.title
-      blog.url = url ? url : blog.url
-      blog.likes = likes ? likes : blog.likes
-      blog.user = user ? user: blog.user
+    if (!blog) {
+      return response.status(404).end()
+    }
 
-      return blog.save().then((updatedBlog) => {
-        response.json(updatedBlog)
-      })
-    })
-    .catch(error => next(error))
+    blog.author = author ?? blog.author
+    blog.title = title ?? blog.title
+    blog.url = url ?? blog.url
+    blog.likes = likes ?? blog.likes
+    blog.user = user ??blog.user
+
+    await blog.save()
+    await blog.populate('user')
+
+    return response.json(blog)
+  } catch (error) {
+    next(error)
+  }
 })
 
 module.exports = blogsRouter

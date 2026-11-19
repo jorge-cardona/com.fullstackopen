@@ -11,7 +11,7 @@ const api = supertest(app)
 
 describe('when there is initially one user in the db', () => {
   beforeEach(async () => {
-    await User.init() // this has to run frist so the index is created correctly
+    // await User.init() // this has to run first so the index is created correctly
     await User.deleteMany({})
 
     const passwordHash = await bcrypt.hash('sekret', 10)
